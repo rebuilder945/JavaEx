@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--配置自定义bean练习-->
+    <bean id="userService" class="org.cqu.service.impl.UesrServiceImpl">
+        <property name="userDao" ref="userDao2"></property>
+    </bean>
+    <bean id="userDao" class="org.cqu.dao.impl.UserDaoImpl"></bean>
+    <bean id="userDao2" class="org.cqu.factory.MyBeanFactory"></bean>
+
+    <!--配置第三方库练习-->
+    <!--dataSource方式配置jdbc连接，构造方法方式初始化-->
+<!--    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">-->
+<!--        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>-->
+<!--        <property name="url" value="jdbc..."></property>-->
+<!--        <property name="username" value="root"></property>-->
+<!--        <property name="password" value="root"></property>-->
+<!--    </bean>-->
+
+    <!--传统方式配置jdbc连接，静态工厂方式初始化-->
+<!--    <bean id="clazz" class="java.lang.Class" factory-method="forName">-->
+<!--        <constructor-arg name="className" value="com.mysql.jdbc.Driver"></constructor-arg>-->
+<!--    </bean>-->
+<!--    <bean id="connection" class="java.sql.DriverManager" factory-method="getConnection" scope="prototype">-->
+<!--        <constructor-arg name="url" value="jdbc:mysql://localhost:3306/mybatis"></constructor-arg>-->
+<!--        <constructor-arg name="user" value="root"></constructor-arg>-->
+<!--        <constructor-arg name="password" value="root"></constructor-arg>-->
+<!--    </bean>-->
+
+    <!--date的解析，实例工厂方式初始化-->
+    <bean id="simpleDateFormat" class="java.text.SimpleDateFormat">
+        <constructor-arg name="pattern" value="yyyy-MM-dd HH:mm:ss" ></constructor-arg>
+    </bean>
+    <bean id="date" factory-bean="simpleDateFormat" factory-method="parse">
+        <constructor-arg name="text" value="2024-06-12 14:38:00"></constructor-arg>
+    </bean>
+
+    <!--SqlSessionFactory初始化示例，仅为三种bean构造方式-->
+<!--    静态工厂-->
+    <bean id="in" class="org.apache.ibatis.io.Resources" factory-method="getResourceAsStream">
+        <constructor-arg name="resource" value="mybatis-config.xml"></constructor-arg>
+    </bean>
+<!--    无参构造-->
+    <bean id="builder" class="org.apache.ibatis.session.SqlSessionFactoryBuilder"></bean>
+<!--    实例工厂-->
+    <bean id="sqlSessionFactory" factory-bean="builder" factory-method="build">
+        <constructor-arg name="inputStream" ref="in"></constructor-arg>
+    </bean>
+    
+    <!-- 后处理器 -->
+    <bean class="org.cqu.processor.MyBeanFactoryPostProcessor"></bean>
+    <bean class="org.cqu.processor.MyBeanDefinitionRegistryPostProcessor"></bean>
+</beans>
