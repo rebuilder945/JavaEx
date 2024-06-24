@@ -26,7 +26,7 @@ public class MyBeanFactoryPostProcessor implements BeanFactoryPostProcessor{
         // 被实现的子类中定义的，因此要进行强制转换
         DefaultListableBeanFactory myliListableBeanFactory = (DefaultListableBeanFactory) beanFactory;
         myliListableBeanFactory.registerBeanDefinition("personDao1", myBeanDefinition);
-        System.out.println(myBeanDefinition);
+        System.out.println("MyBeanFactoryPostProcessor 的 personDao1 注册");
         
     }
 

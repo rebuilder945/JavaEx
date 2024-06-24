@@ -1,7 +1,14 @@
 package solution;
 import java.math.BigInteger;
+import java.util.AbstractSequentialList;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.StringJoiner;
 
@@ -12,6 +19,15 @@ class Solution {
         for (int i = 0; i < arr.length; ++i) {
             System.out.println(arr[i]);
             // System.out.print(String.valueOf(arr[i]) + ", ");
+        }
+    }
+
+    public static void output_array(int[][] arr) {
+        for (int i = 0; i < arr.length; ++i) {
+            for (int j = 0; j < arr[0].length; ++j) {
+                System.out.print(String.valueOf(arr[i][j]) + " ");
+            }       
+            System.out.print("\n");
         }
     }
 
@@ -306,5 +322,388 @@ class Solution {
         return new int[]{i + 1, j + 1};
     }
 
+    // 209. 长度最小的子数组
+    // 滑动窗口: O(n), O(1)
+    public int minSubArrayLen(int target, int[] nums) {
+        int i = 0;
+        int j = 0;
+        int tmp_sum = nums[i];
+        int ans = nums.length + 1;
+        while (i < nums.length && j < nums.length && i <= j) {
+            if (tmp_sum >= target) {
+                ans = Math.min(ans, j - i + 1);
+                tmp_sum -= nums[i++];
+            } else {
+                // 循环中进行下标+1操作，由于范围是lazy-judge的
+                // 因此要先判断一次是否越界
+                ++j;
+                if (j < nums.length) {
+                    tmp_sum += nums[j];
+                }
+            }
+        }
+        return ans != nums.length ? ans : 0;
+    }
+    // 同样是滑动窗口的思想，用双while写法代替多余的if判断
+    public int minSubArrayLen_(int target, int[] nums) {
+        int i = 0, j = 0, tmp_sum = 0, ans= nums.length + 1;
+        while (i < nums.length && j < nums.length && i <= j) {
+            tmp_sum += nums[j];
+            while (tmp_sum >= target && i < nums.length) {
+                ans = j - i + 1 < ans ? j - i + 1 : ans;
+                tmp_sum -= nums[i++];
+            }
+            ++j;            
+        }
+        return ans == nums.length + 1 ? 0 : ans;
+    }
+    // TODO: 前缀和+二分查找：
+    //
+        
+    // 3. 无重复字符的最长子串
+    // 滑动窗口: O(n), O(|Σ|)（其中 Σ\SigmaΣ 表示字符集（即字符串中可以出现的字符），∣Σ∣|\Sigma|∣Σ∣ 表示字符集的大小。）
+    // 题中没有明确说明字符集，因此可以默认为所有 ASCII 码在 [0,128)[0, 128)[0,128) 内的字符
+    // 也可用哈希表
+    // Map<Character, Integer> map = new HashMap<>();
+    // 但HashMap的查键、删除和赋值速度太慢    
+    public int lengthOfLongestSubstring(String s) {
+        int i = 0, j = 0, ans_len = 0;
+        char[] s_ = s.toCharArray();        
+        int[] map = new int[128];
+        while (i < s_.length && j < s_.length && i <= j) {            
+            while (map[s_[j]] == 1 && i < s_.length) {
+                map[s_[i++]] = 0;
+            }
+            map[s_[j++]] = 1;
+            ans_len = j - i > ans_len ? j - i : ans_len;
+        }
+        return ans_len;        
+    }
+
+    // 36. 有效的数独
+    // naive method
+    public boolean isValidSudoku(char[][] board) {
+        // 按行
+        int[] map = new int[9];
+        for (int i = 0; i < board.length; ++i) {
+            for (int j = 0; j < board.length; ++j) {
+                char cur = board[i][j];
+                if (cur == '.') {
+                    continue;
+                }
+                int cur_num = cur - '0';
+                if (map[cur_num - 1] != 0) {
+                    return false;
+                }
+                map[cur_num - 1] = 1;
+            }
+            // 清空map
+            map = new int[9];
+        }
+        // 按列
+        map = new int[9];
+        for (int i = 0; i < board.length; ++i) {
+            for (int j = 0; j < board.length; ++j) {
+                char cur = board[j][i];
+                if (cur == '.') {
+                    continue;
+                }
+                int cur_num = cur - '0';
+                if (map[cur_num - 1] != 0) {
+                    return false;
+                }
+                map[cur_num - 1] = 1;
+            }
+            // 清空map
+            map = new int[9];
+        }
+        // 按块
+        map = new int[9];
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                for (int k = 0; k < 3; ++k) {
+                    for (int l = 0; l < 3; ++l) {
+                        char cur = board[i * 3 + k][j * 3 + l];
+                        if (cur == '.') {
+                            continue;
+                        }
+                        int cur_num = cur - '0';
+                        if (map[cur_num - 1] != 0) {
+                            return false;
+                        }
+                        map[cur_num - 1] = 1;
+                    }
+                }
+                // 清空map
+                map = new int[9];
+            }
+        }
+        return true;
+    }
+    // TODO: 解决bug，并思考如何bitVectorBlock也只用一个数字
+    // one traverse + bit calculation（位向量判断一个限位数列中是否含有重复数字，用：<<, |, &运算符）
+    public boolean isValidSudoku_(char[][] board) {
+        int bitVectorRow = 0;
+        int bitVectorColumn = 0;
+        int[] bitVectorBlock = new int[9];
+        int bitPosition;
+        for (int i = 0; i < board.length; ++i) {
+            for (int j = 0; j < board.length; ++j) {                
+                if (board[i][j] == '.') {
+                    continue;
+                }
+                // 比较行
+                int row_num = board[i][j] - '0';
+                bitPosition = 1 << row_num;
+                if ((bitVectorRow & bitPosition) != 0) {
+                    return false;
+                }
+                bitVectorRow |= bitPosition;
+
+                // 比较块
+                if ((bitVectorBlock[(i / 3) * 3 + (j / 3)] & bitPosition) != 0) {
+                    return false;
+                }
+                bitVectorBlock[(i / 3) * 3 + (j / 3)] |= bitPosition;
+
+                // 比较列
+                int column_num = board[j][i] - '0';
+                bitPosition = 1 << column_num;
+                if ((bitVectorColumn & bitPosition) != 0) {
+                    return false;
+                }
+                bitVectorColumn |= bitPosition;            
+            }
+            // 仅清零行和列的bitVector
+            bitVectorRow = 0;
+            bitVectorColumn = 0;
+        }
+        return true;
+    }
+
+    // 54. 螺旋矩阵
+    // 递归版本的矩阵dfs
+    public List<Integer> dfs_matrix(int[][] matrix, List<Integer> res, int i, int j) {
+        res.add(matrix[i][j]);
+        matrix[i][j] = 101;
+        // go right
+        if (j < matrix[0].length - 1 && matrix[i][j + 1] != 101) {
+            // go up if up is reachable
+            if (i >= 1 && matrix[i - 1][j] != 101) {
+                dfs_matrix(matrix, res, i - 1, j);
+            } else {
+                dfs_matrix(matrix, res, i, j + 1);
+            }
+        }
+        // go down
+        if (i < matrix.length - 1 && matrix[i + 1][j] != 101) {
+            dfs_matrix(matrix, res, i + 1, j);
+        }
+        // go left
+        if (j >= 1 && matrix[i][j - 1] != 101) {            
+            dfs_matrix(matrix, res, i, j - 1);
+        }
+        // go up
+        if (i >= 1 && matrix[i - 1][j] != 101) {
+            dfs_matrix(matrix, res, i - 1, j);
+        }
+        return res;
+    }
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> res = new ArrayList<>();
+        return dfs_matrix(matrix, res, 0, 0);
+    }
+    // TODO: 实现非递归化，用栈或直接循环即可。
+
+    // 48. 旋转图像
+    public void rotate(int[][] matrix) {
+        // 转置
+        for (int i = 0; i < matrix.length; ++i) {
+            for (int j = 0; j <= i; ++j) {
+                int tmp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = tmp;
+            }
+        }
+        // 左右reverse  
+        for (int i = 0; i < matrix.length; ++i) {
+            for (int j = 0; j < (int)(matrix[0].length / 2); ++j) {
+                int tmp = matrix[i][matrix[0].length - 1 - j];
+                matrix[i][matrix[0].length - 1 - j] = matrix[i][j];
+                matrix[i][j] = tmp;
+            }            
+        }
+    }
+
+    // 73. 矩阵置零
+    public void setZeroes(int[][] matrix) {
+        // 记录第0行和第0列是否有0
+        int flag_row = 0;
+        if (matrix[0][0] == 0) {
+            flag_row = 1;
+        } else {
+            // 查看第0行是否存在0
+            for (int j = 1; j < matrix[0].length; ++j) {
+                if (matrix[0][j] == 0) {
+                    flag_row = 1; // 指示0行有0
+                    matrix[0][j] = 0; // 指示j列有0
+                }
+            }
+            // 查看第0列是否存在0
+            for (int i = 0; i < matrix.length; ++i) {
+                if (matrix[i][0] == 0) {
+                    matrix[0][0] = 0; //指示0列有0
+                    matrix[i][0] = 0; // 指示i行有0
+                }
+            }
+        }
+        // 记录有0的行和列
+        for (int i = 1; i < matrix.length; ++i) {
+            for (int j = 1; j < matrix[0].length; ++j) {
+                if (matrix[i][j] == 0) {
+                    matrix[0][j] = 0;
+                    matrix[i][0] = 0;
+                }
+            }
+        }
+        // 清零有0的列
+        for (int j = 1; j < matrix[0].length; ++j) {
+            if (matrix[0][j] == 0) {
+                for (int i = 0; i < matrix.length; ++i) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        // 清零有0的行
+        for (int i = 1; i < matrix.length; ++i) {
+            if (matrix[i][0] == 0) {
+                for (int j = 0; j < matrix[0].length; ++j) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        // 看第0列是否需要清零
+        if (matrix[0][0] == 0) {
+            for (int i = 0; i < matrix.length; ++i) {
+                matrix[i][0] = 0;
+            }
+        }
+        // 看第0行是否需要清零
+        if (flag_row == 1) {
+            for (int j = 0; j < matrix[0].length; ++j) {
+                matrix[0][j] = 0;
+            }
+        }
+    }
+
+    // 74. 生命游戏
+    public void gameOfLife(int[][] board) {
+        for (int i = 0; i < board.length; ++i) {
+            for (int j = 0; j < board[0].length; ++j) {
+                // 获取周围的细胞
+                int[] surrounding = new int[8];
+                surrounding[0] = j > 0 ? board[i][j - 1] : -1; // left
+                surrounding[1] = j < board[0].length - 1 ? board[i][j + 1] : -1; // right
+                surrounding[2] = i > 0 ? board[i - 1][j] : -1; // up 
+                surrounding[3] = i < board.length - 1 ? board[i + 1][j] : -1; // down
+                surrounding[4] = (surrounding[0] != -1 && surrounding[2] != -1) ? board[i - 1][j - 1] : -1; // leftup
+                surrounding[5] = (surrounding[1] != -1 && surrounding[2] != -1) ? board[i - 1][j + 1] : -1; // rightup
+                surrounding[6] = (surrounding[0] != -1 && surrounding[3] != -1) ? board[i + 1][j - 1] : -1; // leftdown
+                surrounding[7] = (surrounding[1] != -1 && surrounding[3] != -1) ? board[i + 1][j + 1] : -1; // rightdown
+                // 记录周围活细胞个数
+                int live = 0;
+                for (int i_ : surrounding) {
+                    // 变化前的活细胞 + 未变化的活细胞
+                    if (i_ == 3 || i_ == 1) ++live;
+                }
+                // 细胞状态变化
+                // 2:由0变为1, 3:由1变为0
+                if (board[i][j] == 1) {
+                    if (live < 2 || live > 3) {
+                        board[i][j] = 3;
+                    }
+                } else {
+                    if (live == 3) {
+                        board[i][j] = 2;
+                    }
+                }
+            }            
+        }
+        // 还原2和3
+        for (int i = 0; i < board.length; ++i) {
+            for (int j = 0; j < board[0].length; ++j) {
+                if (board[i][j] == 2) {
+                    board[i][j] = 1;
+                }
+                if (board[i][j] == 3) {
+                    board[i][j] = 0;
+                }                
+            }
+        }
+    }
+
+    // 49. 字母异位词分组
+    public List<List<String>> groupAnagrams(String[] strs) {
+        HashMap<String, List<String>> map = new HashMap<>();
+        for (String x : strs) {
+            // 法1）计算唯一的哈希字符串            
+            // char[] tmp = x.toCharArray();
+            // int[] project = new int[26];
+            // StringBuffer hash_str = new StringBuffer();
+            // for (int i = 0; i < tmp.length; ++i) {
+            //     project[tmp[i] - 'a'] += 1;
+            // }
+            // for (int i = 0; i < project.length; ++i) {
+            //     if (project[i] != 0) {
+            //         hash_str.append(i + 'a');
+            //         hash_str.append(project[i]);
+            //     }
+            // }
+            // 法2）直接排序
+            char[] tmp = x.toCharArray();
+            Arrays.sort(tmp);            
+            String x_ = new String(tmp);
+            // 放入哈希表对应位置
+            List<String> tmp_list = map.getOrDefault(x_, new ArrayList<String>());
+            tmp_list.add(x);
+            map.put(x_, tmp_list);
+            // 可用上面的map.getOrDefault简化书写，但要注意最后得put
+            // if (map.get(x_) == null) {
+            //     map.put(x_, new ArrayList<String>());
+            // }
+            // map.get(x_).add(x);
+        }
+        return new ArrayList<>(map.values());
+    }
+
+    // 128. 最长连续序列
+    public int longestConsecutive(int[] nums) {
+        if (nums.length == 0) {
+            return 0;
+        }
+        // 每一个放入hash表
+        HashMap<Integer, Integer> map = new HashMap<>();        
+        for (int num : nums) {
+            map.put(num, 1);
+        }
+        // 计算每个数字前面的数的连续长度
+        int len = 0;
+        int max_len = len;
+        for (int num : nums) {
+            int tmp = num;
+            len = 0;
+            while (map.containsKey(tmp) && map.get(tmp) != 0) {
+                len += map.get(tmp);
+                map.put(tmp, 0);
+                tmp -= 1;
+            }
+            map.put(num, len);
+            max_len = len > max_len ? len : max_len;
+        }
+        return max_len;
+    }
+    // 可继续优化。。。
+
     // 
+
 }

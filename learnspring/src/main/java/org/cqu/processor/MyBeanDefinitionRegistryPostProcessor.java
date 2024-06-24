@@ -17,11 +17,12 @@ public class MyBeanDefinitionRegistryPostProcessor implements BeanDefinitionRegi
         myBeanDefinition.setBeanClassName("org.cqu.dao.impl.PersonDaoImpl");
         myBeanDefinition.setScope("prototype");
         registry.registerBeanDefinition("personDao2", myBeanDefinition);
-        System.out.println(myBeanDefinition);
+        System.out.println("MyBeanDefinitionRegistryPostProcessor 的 personDao2 注册");
     }
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        System.out.println("MyBeanDefinitionRegistryPostProcessor 的 postProcessBeanFactory 进入");
     }
 
     
