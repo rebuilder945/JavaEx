@@ -1,0 +1,96 @@
+<!-- 声明文档类型 -->
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- js -->
+<!-- 
+- js的输出语句：
+window.alert("hello world") 弹出警告框;
+document.write("hello world") 写入html内;
+console.log("hello world") 在控制台输出;
+- js函数，支持内联
+- js自定义对象：
+- js的Array、String对象
+- BOM：
+    - window对象：代表浏览器窗口，可以控制浏览器窗口的显示和隐藏
+    - location对象：代表浏览器地址栏，可以控制浏览器地址栏的跳转    
+- DOM：
+    - document对象：代表整个html文档，可以控制html文档中的元素
+    - getElementById()：通过id获取元素
+- 事件监听：
+    - onclick：点击事件
+    - onblur：失去焦点事件
+    - onfocus：获得焦点事件
+    - onchange：内容改变事件
+    - onsubmit：表单提交事件
+    - 。。。等
+-->
+
+<head>
+    <!-- 指定字符集 -->
+    <meta charset="UTF-8">
+    <!-- 设置浏览器兼容性 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 设置标题 -->
+    <title>焦点访谈</title>
+    <!-- <style>
+        h3 {
+            color: red;
+        }
+    </style> -->
+    <link rel="stylesheet" href="./css/1.css">
+</head>
+
+<body>
+    <div>
+        <hr>
+        <span>
+            <h3 class="title">焦点访谈</h3>
+            <b>2023年3月15日</b>
+        </span>
+        <p>
+            <b style="color: black;">你好</b> 本课程基于主流的前后端分离的开发模式进行设计和讲解，基于主流的SpringBoot来讲解整个Web开发的知识点，
+        </p>
+        <p id="second_para">
+            参照企业开发模式，需求分析-表结构设计-接口文档-功能接口实现-测试-联调，理论与实践相结合，通过案例贯穿整个课程体系，学以致用。
+        </p>
+        <hr>
+        <p>
+            <img src="./assets/2429192510468259840.jpg", width="50%" , height="50%">
+            <br>
+            <a href="baidu.com" class="link">百度</a>      
+        </p>        
+        <table border="1" cellspacing="0" width="200px" >
+            <!-- 表头单元格的行默认居中 -->
+            <tr>
+                <th>姓名</th>
+                <th>年龄</th>
+            </tr>
+            <!-- 普通单元格的行要写 -->
+            <tr align="center">
+                <td>张三</td>
+                <td>20</td>
+            </tr>
+        </table>
+        <!-- action填表单提交到的目标url，一般是后端提供，不写默认到本页面
+         ；method，get方法将表单数据直接加载url后面，post将表单数据封装在请求体中 -->
+        <form action="" method="get">
+            <!-- 表单标签：<input> -->
+            <input type="text" name="username" placeholder="请输入用户名">
+            <input type="password" name="password" placeholder="请输入密码">
+            <input type="radio" name="sex" value="male">男
+            <input type="radio" name="sex" value="female">女
+            <input type="checkbox" name="hobby" value="reading">阅读
+            <input type="checkbox" name="hobby" value="swimming">游泳
+            <input type="submit" value="提交">
+            
+        </form>
+        <p id="plast">
+            责任编辑：A
+        </p>
+    </div>
+    
+</body>
+
+</html>

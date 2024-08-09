@@ -1,0 +1,51 @@
+/* css样式：外联、内嵌、行内，优先级依次提升 */
+
+#second_para {
+    /* id选择器 */
+    /* 优先级最高 */
+    color: green;
+
+}
+
+#plast {
+    color: rgb(0, 255, 0);
+    text-align: center;
+}
+
+.title {
+    /* 类选择器 */
+    /* 次之 */
+    color: rgb(154, 76, 76);
+}
+
+h3 {
+    /* 名称选择器 */
+    /* 优先级最低 */
+    color: grey;
+}
+
+p {
+    color: #da1a5b;
+    text-indent: 3ch;
+}
+
+.link {
+    color: red;
+}
+
+/* css盒子模型，主要对两个标签适用: div、span*/
+div {
+    width: 60%;
+    /* border表示盒子的边框线条 */
+    border: 1px solid rgb(0, 0, 0);
+    /* padding表示内边距 */
+    padding: 10px;
+    /* 外边距，只写两个值表示上下和左右，auto自动平均分配 */
+    margin: 0 auto;
+    /* 背景颜色为盒子模型的背景，不包括外边距 */
+    background-color: rgb(255, 255, 255);
+}
+
+span {
+
+}
